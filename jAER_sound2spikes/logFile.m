@@ -9,15 +9,22 @@
 % https://svn.code.sf.net/p/jaer/code/scripts/matlab/cochlea/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function logFile(y, fs, fileName, udpPort)
+function logFile(y, Fs, fileName, udpPort)
+    % Create audioplayer object
+    player = audioplayer(y, Fs);
+
+    % Start logging
     fprintf(udpPort, ['startlogging ' fileName]); % Send the command
     fprintf('%s', fscanf(udpPort)); % Print the response
-    
-    pause(0.1);
-    sound(y, fs); % Plays the sound
-    pause(length(y) / fs); % Wait until it ends
-    
-    pause(0.1)
+
+    % Play the sound
+    play(player);
+
+    while isplaying(player)
+        pause(0.005);
+    end
+
+    % Stop logging
     fprintf(udpPort,'stoplogging'); % Send the command
     fprintf('%s', fscanf(udpPort)); % Print the response
 end
