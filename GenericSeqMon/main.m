@@ -16,8 +16,8 @@ startup
 
 current_path = pwd;
 
-folder_name = strcat(current_path,'\dataset\audio');
-dest_folder_name = strcat(current_path,'\dataset\events');
+folder_name = strcat(current_path,'\..\datasets\audio');
+dest_folder_name = strcat(current_path,'\..\datasets\events');
 
 classes_folders = dir(folder_name);
 classes_folders = classes_folders(3:5);     %change in case of different dataset
