@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+jAER_sound2spikes_Python/*
+!jAER_sound2spikes_Python/*.py
+
+jAER_sound2spikes_MatLab/*
+!jAER_sound2spikes_MatLab/*.py
