@@ -9,7 +9,7 @@
 % https://svn.code.sf.net/p/jaer/code/scripts/matlab/cochlea/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Open connection to jAER:
+% Open connection to jAER
 udpPort = udp('localhost', 8997);
 fopen(udpPort);
 

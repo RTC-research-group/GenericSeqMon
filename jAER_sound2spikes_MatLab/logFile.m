@@ -20,6 +20,9 @@ function logFile(y, Fs, fileName, udpPort)
     % Play the sound
     play(player);
 
+    % Wait until its end
+    pause(length(y) / Fs);
+
     while isplaying(player)
         pause(0.005);
     end
