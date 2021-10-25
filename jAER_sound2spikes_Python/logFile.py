@@ -1,14 +1,15 @@
 import sys
+import time
 
 from playsound import playsound
 
 
-def logFile(srcAudiofile, dstEventsfile, udpSocket):
+def logFile(src_audiofile, dst_spikesfile, udp_socket):
     # Start logging
-    command = "startlogging " + dstEventsfile
-    udpSocket.send(command.encode())  # Send the command
+    command = "startlogging " + dst_spikesfile
+    udp_socket.send(command.encode())  # Send the command
     try:
-        response = udpSocket.recv(1024)  # Buffer size is 1024 bytes
+        response = udp_socket.recv(1024)  # Buffer size is 1024 bytes
         print(response[:-3].decode())  # Print the response
     except ConnectionResetError:
         print("Cannot establish connection to jAER. Make sure you have it opened")
@@ -16,13 +17,15 @@ def logFile(srcAudiofile, dstEventsfile, udpSocket):
 
     # Play the sound
     # IMPORTANT: playsound v1.2.2
-    playsound(srcAudiofile)
+    time.sleep(0.1)
+    playsound(src_audiofile)
+    time.sleep(0.1)
 
     # Stop logging
     command = "stoplogging"
-    udpSocket.send(command.encode())  # Send the command
+    udp_socket.send(command.encode())  # Send the command
     try:
-        response = udpSocket.recv(1024)  # Buffer size is 1024 bytes
+        response = udp_socket.recv(1024)  # Buffer size is 1024 bytes
         print(response[:-3].decode())  # Print the response
     except ConnectionResetError:
         print("Cannot establish connection to jAER. Make sure you have it opened")

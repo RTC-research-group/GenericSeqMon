@@ -5,8 +5,8 @@ from logFile import logFile
 
 if __name__ == '__main__':
     # Open connection to jAER
-    udpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    udpSocket.connect(('127.0.0.1', 8997))
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udp_socket.connect(('127.0.0.1', 8997))
 
     # Get the current project directory
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +23,7 @@ if __name__ == '__main__':
         # For each dataset create the associated events folder
         save_folder_name = dest_folder_name + i + "_aedats/"
         if not os.path.exists(save_folder_name):
-            os.mkdir(save_folder_name)
+            os.makedirs(save_folder_name)
 
         # Get a list of all files in the dataset
         files_in_class = os.listdir(folder_name + i)
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         for j in files_in_class:
             logFile(folder_name + i + "/" + j,
                     save_folder_name + j,
-                    udpSocket)
+                    udp_socket)
 
     # Close the UDP connection to jAER
-    udpSocket.close()
+    udp_socket.close()
