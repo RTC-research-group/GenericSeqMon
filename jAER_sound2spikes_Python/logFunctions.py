@@ -2,33 +2,32 @@ import sys
 import time
 from threading import Thread
 
+from AERzip import compressFunctions
 from playsound import playsound
 
 # TODO: Fix variable names
-
-# TODO: Install pypi package
-from ...AERzip.AERzip import compressFunctions
 
 collector_thread = None
 data = bytearray()
 end_collector_thread = False
 
 
-def logFile(src_audiofile, dst_spikesfile, udp_socket):
+def logFile(src_directory, dst_directory, dataset_name, file_name, udp_socket):
     # Start logging
-    command = "startlogging " + dst_spikesfile
+    command = "startlogging " + dst_directory + "/" + dataset_name + "/" + file_name
     udp_socket.send(command.encode())  # Send the command
     try:
         response = udp_socket.recv(1024)  # Buffer size is 1024 bytes
         print(response[:-3].decode())  # Print the response
     except ConnectionResetError:
         print("Cannot establish connection to jAER. Make sure you have it opened")
+        # TODO: Exceptions
         sys.exit(1)
 
     # Play the sound
     # IMPORTANT: playsound v1.2.2
     time.sleep(0.1)
-    playsound(src_audiofile)
+    playsound(src_directory + "/" + dataset_name + "/" + file_name)
     time.sleep(0.1)
 
     # Stop logging
@@ -42,7 +41,7 @@ def logFile(src_audiofile, dst_spikesfile, udp_socket):
         sys.exit(1)
 
 
-def logCompressedFile(src_audiofile, dst_spikesfile, udp_socket, settings):
+def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp_socket, settings):
     global collector_thread, data, end_collector_thread
 
     # --- Wait while data collector thread is alive ---
@@ -59,7 +58,7 @@ def logCompressedFile(src_audiofile, dst_spikesfile, udp_socket, settings):
     end_collector_thread = False
 
     # --- Start data collector thread ---
-    print("Collecting data for file " + dst_spikesfile)
+    print("Collecting data for file " + dataset_name + "/" + file_name)
     data = bytearray()
     collector_thread = Thread(target=collectUdpData, args=[udp_socket, ])
     collector_thread.start()
@@ -67,16 +66,16 @@ def logCompressedFile(src_audiofile, dst_spikesfile, udp_socket, settings):
     # Play the sound
     # IMPORTANT: playsound v1.2.2
     time.sleep(0.1)
-    playsound(src_audiofile)
+    playsound(src_directory + "/" + dataset_name + "/" + file_name)
     time.sleep(0.1)
 
     # Enable ending of the data collector thread
     print("Stop collecting data")
     end_collector_thread = True
 
-    # Compress data with AERZip
-    # TODO: compressData function definition without loading
-    compressFunctions.compressAedat(events_dir, spikes_file_path, settings, return_data=False)
+    # Compress and store data with AERZip
+    compressed_data = compressFunctions.compressData(data, compressor="ZSTD")
+    compressFunctions.storeCompressedFile(compressed_data, dst_directory, dataset_name, file_name)
 
 
 def collectUdpData(udp_socket):
