@@ -19,7 +19,7 @@ if __name__ == '__main__':
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         udp_socket.bind(('127.0.0.1', 8991))
 
-    # Define source settings
+    # Define source settings (for compressed files)
     jAER_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=4, ts_tick=1,
                                  bin_size=10000)
 

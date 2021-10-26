@@ -9,9 +9,9 @@ from playsound import playsound
 # TODO: Install pypi package
 from ...AERzip.AERzip import compressFunctions
 
-collectorThread = None
+collector_thread = None
 data = bytearray()
-endCollectorThread = False
+end_collector_thread = False
 
 
 def logFile(src_audiofile, dst_spikesfile, udp_socket):
@@ -43,26 +43,26 @@ def logFile(src_audiofile, dst_spikesfile, udp_socket):
 
 
 def logCompressedFile(src_audiofile, dst_spikesfile, udp_socket, settings):
-    global collectorThread, data, endCollectorThread
+    global collector_thread, data, end_collector_thread
 
     # --- Wait while data collector thread is alive ---
-    timeIni = time.time()
-    showMessage = True
+    start_time = time.time()
+    show_message = True
 
-    while collectorThread is not None and collectorThread.is_alive():
-        if time.time() - timeIni > 5 and showMessage:
-            showMessage = False
+    while collector_thread is not None and collector_thread.is_alive():
+        if time.time() - start_time > 5 and show_message:
+            show_message = False
             print("\nSomething went wrong: Unable to receive data from UDP socket...")
         time.sleep(0.1)
 
     # --- Disable ending of the data collector thread ---
-    endCollectorThread = False
+    end_collector_thread = False
 
     # --- Start data collector thread ---
     print("Collecting data for file " + dst_spikesfile)
     data = bytearray()
-    collectorThread = Thread(target=collectUdpData, args=[udp_socket, ])
-    collectorThread.start()
+    collector_thread = Thread(target=collectUdpData, args=[udp_socket, ])
+    collector_thread.start()
 
     # Play the sound
     # IMPORTANT: playsound v1.2.2
@@ -72,18 +72,18 @@ def logCompressedFile(src_audiofile, dst_spikesfile, udp_socket, settings):
 
     # Enable ending of the data collector thread
     print("Stop collecting data")
-    endCollectorThread = True
+    end_collector_thread = True
 
     # Compress data with AERZip
     # TODO: compressData function definition without loading
-    compressFunctions.compressAedat(events_dir, spikes_file_path, settings, returnData=False)
+    compressFunctions.compressAedat(events_dir, spikes_file_path, settings, return_data=False)
 
 
 def collectUdpData(udp_socket):
     global data
 
     # Receive data from socket
-    while not endCollectorThread:
+    while not end_collector_thread:
         buffer = udp_socket.recv(1024)
         if buffer:
             data.extend(buffer)
