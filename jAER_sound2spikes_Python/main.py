@@ -1,9 +1,12 @@
 import os
 import socket
+import time
 
 from pyNAVIS import MainSettings
 
 from logFunctions import logFile, logCompressedFile
+
+# TODO: Check all paths. Take notes
 
 if __name__ == '__main__':
     # Define operation mode
@@ -20,8 +23,8 @@ if __name__ == '__main__':
         udp_socket.bind(('127.0.0.1', 8991))
 
     # Define source settings (for compressed files)
-    jAER_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=4, ts_tick=1,
-                                 bin_size=10000)
+    jAER_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=4, timestamp_size=4,
+                                 ts_tick=1, bin_size=10000)
 
     # Get the current project directory
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -45,9 +48,9 @@ if __name__ == '__main__':
         # jAER processing) saving it in the new events folder
         for j in files:
             if mode != "compressed":
-                logFile(src_directory, dst_directory, i, j + ".aedat", udp_socket)
+                logFile(src_directory, dst_directory, i, j, udp_socket)
             else:
-                logCompressedFile(src_directory, dst_directory, i, j + ".aedat", udp_socket, jAER_settings)
+                logCompressedFile(src_directory, dst_directory, i, j, udp_socket, jAER_settings)
                 # TODO: Generate plots
 
     # Close the UDP connection to jAER
