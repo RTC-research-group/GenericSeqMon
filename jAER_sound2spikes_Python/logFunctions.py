@@ -78,13 +78,13 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     address_size, timestamp_size = compressFunctions.getBytesToDiscard(settings)
     header = CompressedFileHeader(compressor, settings.address_size, settings.timestamp_size)
     # bytesToSpikesFile function needs to know data's address_size and timestamp_size
-    # TODO: Verbose. Compression time reduction
+    # TODO: ----------- Compression time reduction!!! -------------
     raw_data = bytesToSpikesFile(data, dataset_name, file_name, header)
     file_data = compressFunctions.rawFileToCompressedFile(raw_data, address_size, timestamp_size, compressor)
     compressFunctions.storeCompressedFile(file_data, dst_directory, dataset_name + "_aedats", file_name + ".aedat")
 
     end_time = time.time()
-    print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+    print("\nDone! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)\n")
 
 
 def collectUdpData(udp_socket):
