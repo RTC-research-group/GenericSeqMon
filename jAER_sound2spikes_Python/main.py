@@ -7,7 +7,7 @@ from logFunctions import logFile, logCompressedFile
 
 if __name__ == '__main__':
     # Define operation mode
-    mode = "compressed"
+    mode = "uncompressed"
 
     # Open connection to jAER
     udp_socket = None

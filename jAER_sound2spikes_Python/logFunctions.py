@@ -1,10 +1,10 @@
+import os
 import sys
 import time
 from threading import Thread
 
 from AERzip import compressFunctions
-from AERzip.CompressedFileHeader import CompressedFileHeader
-from AERzip.compressFunctions import bytesToSpikesFile, bytesToSpikesBytearray
+from AERzip.compressFunctions import bytesToSpikesBytearray
 from playsound import playsound
 
 collector_thread = None
@@ -13,6 +13,13 @@ end_collector_thread = False
 
 
 def logFile(src_directory, dst_directory, dataset_name, file_name, udp_socket):
+    # Check the destination folder
+    if not os.path.exists(dst_directory):
+        os.makedirs(dst_directory)
+
+    if not os.path.exists(dst_directory + "/" + dataset_name + "_aedats" + "/"):
+        os.makedirs(dst_directory + "/" + dataset_name + "_aedats" + "/")
+
     # Start logging
     command = "startlogging " + dst_directory + "/" + dataset_name + "_aedats" + "/" + file_name + ".aedat"
     udp_socket.send(command.encode())  # Send the command
