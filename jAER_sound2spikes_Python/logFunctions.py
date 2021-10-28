@@ -4,7 +4,7 @@ from threading import Thread
 
 from AERzip import compressFunctions
 from AERzip.CompressedFileHeader import CompressedFileHeader
-from AERzip.compressFunctions import bytesToSpikesFile
+from AERzip.compressFunctions import bytesToSpikesFile, bytesToSpikesBytearray
 from playsound import playsound
 
 collector_thread = None
@@ -75,16 +75,17 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     start_time = time.time()
     print("Compressing and storing data for file " + "/" + dataset_name + "_aedats" + "/" + file_name + ".aedat")
 
-    address_size, timestamp_size = compressFunctions.getBytesToDiscard(settings)
-    header = CompressedFileHeader(compressor, settings.address_size, settings.timestamp_size)
-    # bytesToSpikesFile function needs to know data's address_size and timestamp_size
-    # TODO: ----------- Compression time reduction!!! -------------
-    raw_data = bytesToSpikesFile(data, dataset_name, file_name, header)
-    file_data = compressFunctions.rawFileToCompressedFile(raw_data, address_size, timestamp_size, compressor)
+    new_address_size, new_timestamp_size = compressFunctions.getBytesToDiscard(settings)
+    # bytesToSpikesFile function needs to know data's original address_size and timestamp_size
+    raw_data = bytesToSpikesBytearray(data, dataset_name, file_name,
+                                      settings.address_size, settings.timestamp_size,
+                                      new_address_size, new_timestamp_size)
+    file_data = compressFunctions.rawFileToCompressedFile(raw_data, new_address_size,
+                                                          new_timestamp_size, compressor)
     compressFunctions.storeCompressedFile(file_data, dst_directory, dataset_name + "_aedats", file_name + ".aedat")
 
     end_time = time.time()
-    print("\nDone! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)\n")
+    print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)\n")
 
 
 def collectUdpData(udp_socket):

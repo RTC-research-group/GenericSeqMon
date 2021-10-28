@@ -1,12 +1,9 @@
 import os
 import socket
-import time
 
 from pyNAVIS import MainSettings
 
 from logFunctions import logFile, logCompressedFile
-
-# TODO: Check all paths. Take notes
 
 if __name__ == '__main__':
     # Define operation mode
