@@ -87,7 +87,7 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     raw_data = bytesToSpikesBytearray(data, dataset_name, file_name,
                                       settings.address_size, settings.timestamp_size,
                                       new_address_size, new_timestamp_size)
-    file_data = compressFunctions.rawFileToCompressedFile(raw_data, new_address_size,
+    file_data = compressFunctions.rawSpikesToCompressedFile(raw_data, new_address_size,
                                                           new_timestamp_size, compressor)
     compressFunctions.storeCompressedFile(file_data, dst_directory, dataset_name + "_aedats", file_name + ".aedat")
 
