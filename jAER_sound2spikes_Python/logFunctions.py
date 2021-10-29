@@ -1,3 +1,4 @@
+import copy
 import os
 import sys
 import time
@@ -6,6 +7,7 @@ from threading import Thread
 from AERzip import compressFunctions
 from AERzip.compressFunctions import bytesToSpikesBytearray
 from playsound import playsound
+from pyNAVIS import Functions
 
 collector_thread = None
 data = bytearray()
@@ -83,16 +85,30 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     print("Compressing and storing data for file " + "/" + dataset_name + "_aedats" + "/" + file_name + ".aedat")
 
     new_address_size, new_timestamp_size = compressFunctions.getBytesToDiscard(settings)
-    # bytesToSpikesFile function needs to know data's original address_size and timestamp_size
-    raw_data = bytesToSpikesBytearray(data, dataset_name, file_name,
-                                      settings.address_size, settings.timestamp_size,
-                                      new_address_size, new_timestamp_size)
-    file_data = compressFunctions.rawSpikesToCompressedFile(raw_data, new_address_size,
+
+    raw_file = compressFunctions.bytesToSpikesFile(data, dataset_name, file_name, settings, new_address_size, new_timestamp_size)
+
+    file_data = compressFunctions.rawFileToCompressedFile(raw_file, new_address_size,
                                                           new_timestamp_size, compressor)
+
     compressFunctions.storeCompressedFile(file_data, dst_directory, dataset_name + "_aedats", file_name + ".aedat")
 
     end_time = time.time()
-    print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)\n")
+    print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)")
+
+    # --- Generating plots ---
+    start_time = time.time()
+
+    new_settings = copy.deepcopy(settings)
+    new_settings.address_size = new_address_size
+    new_settings.timestamp_size = new_timestamp_size
+
+    # PDF_report function needs SpikesFile input
+    Functions.PDF_report(raw_file, new_settings, dst_directory + "/" + dataset_name +
+                         "_aedats" + "/" + file_name + ".pdf")
+
+    end_time = time.time()
+    print("Plots generated in " + '{0:.3f}'.format(end_time - start_time) + " seconds\n")
 
 
 def collectUdpData(udp_socket):

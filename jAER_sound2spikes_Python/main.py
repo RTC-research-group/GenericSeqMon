@@ -64,7 +64,6 @@ if __name__ == '__main__':
                 logFile(src_directory, dst_directory, i, j, udp_socket)
             else:
                 logCompressedFile(src_directory, dst_directory, i, j, udp_socket, jAER_settings)
-                # TODO: Generate plots
 
             print("File " + str(file_count) + "/" + str(files_length) + " in dataset " +
                   str(dataset_count) + "/" + str(datasets_length) + " has been processed\n")
