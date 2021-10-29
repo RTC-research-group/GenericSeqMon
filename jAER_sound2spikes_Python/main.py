@@ -1,11 +1,14 @@
 import os
 import socket
+import time
 
 from pyNAVIS import MainSettings
 
 from logFunctions import logFile, logCompressedFile
 
 if __name__ == '__main__':
+    start_time = time.time()
+
     # Define operation mode
     mode = "uncompressed"
 
@@ -70,3 +73,7 @@ if __name__ == '__main__':
         udp_socket.close()
     else:
         udp_socket.close()
+
+    end_time = time.time()
+
+    print("All files have been processed in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
