@@ -33,22 +33,37 @@ if __name__ == '__main__':
     else:
         dst_directory = current_path + "/../datasets/compressedEvents"
 
-    # Get each folder (dataset) in source (audio) folder
+    # Get a list of all datasets in source (audio) folder
     datasets = os.listdir(src_directory)
+    datasets_length = len(datasets)
+
+    # Dataset count variable
+    dataset_count = 0
 
     # For each dataset get all files
     for i in datasets:
-        # Get a list of all files in the dataset
+        # Increase the dataset count and clear the file count
+        dataset_count += 1
+        file_count = 0
+
+        # Get a list of all files in the dataset and his length
         files = os.listdir(src_directory + "/" + i)
+        files_length = len(files)
 
         # Read each file and convert audio information into events (through
         # jAER processing) saving it in the new events folder
         for j in files:
+            # Increase the file number
+            file_count += 1
+
             if mode != "compressed":
                 logFile(src_directory, dst_directory, i, j, udp_socket)
             else:
                 logCompressedFile(src_directory, dst_directory, i, j, udp_socket, jAER_settings)
                 # TODO: Generate plots
+
+            print("File " + str(file_count) + "/" + str(files_length) + " in dataset " +
+                  str(dataset_count) + "/" + str(datasets_length) + " has been processed\n")
 
     # Close the UDP connection to jAER
     if mode != "compressed":
