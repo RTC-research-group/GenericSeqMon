@@ -1,3 +1,4 @@
+import math
 import os
 import socket
 import time
@@ -76,4 +77,10 @@ if __name__ == '__main__':
 
     end_time = time.time()
 
-    print("All files have been processed in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+    diff = end_time - start_time
+    seconds = int(diff % 60)
+    minutes = int(diff % (60 * 60))
+    hours = int(diff % (60 * 60 * 24))
+    days = int(math.floor(diff / (60 * 60 * 24)))
+    print("All files have been processed in " + str(days) + " days, " + str(hours) + " hours, "
+          + str(minutes) + " minutes and " + str(diff) + " seconds")
