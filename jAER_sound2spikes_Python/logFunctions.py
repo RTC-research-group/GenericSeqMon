@@ -13,6 +13,8 @@ collector_thread = None
 data = bytearray()
 end_collector_thread = False
 
+# TODO: Fix variable names
+
 
 def logFile(src_directory, dst_directory, dataset_name, file_name, udp_socket):
     # Check the destination folder
@@ -86,10 +88,10 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
 
     new_address_size, new_timestamp_size = compressFunctions.getBytesToDiscard(settings)
 
-    raw_file = compressFunctions.discardBytesToSpikesFile(data, dataset_name, file_name, settings,
+    spikes_file = compressFunctions.discardBytesToSpikesFile(data, dataset_name, file_name, settings,
                                                           new_address_size, new_timestamp_size)
 
-    file_data = compressFunctions.rawFileToCompressedFile(raw_file, new_address_size,
+    file_data = compressFunctions.rawFileToCompressedFile(spikes_file, new_address_size,
                                                           new_timestamp_size, compressor)
 
     compressFunctions.storeCompressedFile(file_data, dst_directory, dataset_name + "_aedats", file_name + ".aedat")
@@ -105,8 +107,8 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     new_settings.timestamp_size = new_timestamp_size
 
     # PDF_report function needs SpikesFile input
-    Functions.PDF_report(raw_file, new_settings, dst_directory + "/" + dataset_name +
-                         "_aedats" + "/" + file_name + ".pdf")
+    Functions.PDF_report(spikes_file, new_settings, dst_directory + "/../reports/" + dataset_name +
+                         "/" + file_name + ".pdf")
 
     end_time = time.time()
     print("Plots generated in " + '{0:.3f}'.format(end_time - start_time) + " seconds\n")
