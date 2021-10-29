@@ -86,7 +86,8 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
 
     new_address_size, new_timestamp_size = compressFunctions.getBytesToDiscard(settings)
 
-    raw_file = compressFunctions.bytesToSpikesFile(data, dataset_name, file_name, settings, new_address_size, new_timestamp_size)
+    raw_file = compressFunctions.discardBytesToSpikesFile(data, dataset_name, file_name, settings,
+                                                          new_address_size, new_timestamp_size)
 
     file_data = compressFunctions.rawFileToCompressedFile(raw_file, new_address_size,
                                                           new_timestamp_size, compressor)
