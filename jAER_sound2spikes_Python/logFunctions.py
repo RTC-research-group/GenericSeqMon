@@ -4,14 +4,14 @@ import sys
 import time
 from threading import Thread
 
-from AERzip import compressFunctions
-from AERzip.compressFunctions import bytesToSpikesBytearray
+from AERzip import compressionFunctions, conversionFunctions
 from playsound import playsound
 from pyNAVIS import Functions
 
 collector_thread = None
 data = bytearray()
 end_collector_thread = False
+
 
 # TODO: Fix variable names
 
@@ -86,15 +86,10 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     start_time = time.time()
     print("Compressing and storing data for file " + "/" + dataset_name + "_aedats" + "/" + file_name + ".aedat")
 
-    new_address_size, new_timestamp_size = compressFunctions.getBytesToDiscard(settings)
-
-    spikes_file = compressFunctions.discardBytesToSpikesFile(data, dataset_name, file_name, settings,
-                                                          new_address_size, new_timestamp_size)
-
-    file_data = compressFunctions.rawFileToCompressedFile(spikes_file, new_address_size,
-                                                          new_timestamp_size, compressor)
-
-    compressFunctions.storeCompressedFile(file_data, dst_directory, dataset_name + "_aedats", file_name + ".aedat")
+    new_address_size, new_timestamp_size = compressionFunctions.getBytesToPrune(settings)
+    spikes_file = conversionFunctions.pruneBytesToSpikesFile(data, settings, new_address_size, new_timestamp_size)
+    file_data = compressionFunctions.spikesFileToCompressedFile(spikes_file, new_address_size, new_timestamp_size, compressor)
+    compressionFunctions.storeCompressedFile(file_data, dst_directory, dataset_name + "_aedats", file_name + ".aedat")
 
     end_time = time.time()
     print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)")
