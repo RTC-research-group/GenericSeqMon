@@ -12,7 +12,7 @@ if __name__ == '__main__':
     start_time = time.time()
 
     # Define operation mode
-    mode = "uncompressed"
+    mode = "compressed"
 
     # Open connection to jAER
     udp_socket = None
@@ -84,8 +84,10 @@ if __name__ == '__main__':
             _, spikes_file, new_settings = compressionFunctions.compressedFileToSpikesFile(spikes_file, jAER_settings)
 
             dataset_report_path = os.path.abspath(dst_directory + "/../reports/" + os.path.basename(dir_path) + "/")
+
             if not os.path.exists(dataset_report_path):
                 os.makedirs(dataset_report_path)
+
             ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
 
     diff = end_time - start_time
