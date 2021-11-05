@@ -14,6 +14,7 @@ end_collector_thread = False
 
 
 # TODO: Fix variable names
+# TODO: Fix parameters and paths
 
 
 def logFile(src_directory, dst_directory, dataset_name, file_name, udp_socket):
@@ -86,10 +87,13 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     start_time = time.time()
     print("Compressing and storing data for file " + "/" + dataset_name + "_aedats" + "/" + file_name + ".aedat")
 
-    new_address_size, new_timestamp_size = compressionFunctions.getBytesToPrune(settings)
-    spikes_file = conversionFunctions.pruneBytesToSpikesFile(data, settings, new_address_size, new_timestamp_size)
-    file_data = compressionFunctions.spikesFileToCompressedFile(spikes_file, new_address_size, new_timestamp_size, compressor)
-    compressionFunctions.storeCompressedFile(file_data, dst_directory, dataset_name + "_aedats", file_name + ".aedat")
+    # Trick to allow "original file" bytes conversion to SpikesFile object. TODO: AERzip must fix the parameters
+    spikes_file, settings = conversionFunctions.bytesToSpikesFile(data, settings, settings)
+    new_address_size, new_timestamp_size = compressionFunctions.getBytesToPrune(spikes_file, settings)
+    file_data = compressionFunctions.spikesFileToCompressedFile(spikes_file, settings, new_address_size,
+                                                                new_timestamp_size, compressor)
+    compressionFunctions.storeCompressedFile(file_data, dst_directory + "/" + dataset_name +
+                                             "_aedats_" + compressor + "/" + file_name + ".aedat")
 
     end_time = time.time()
     print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)")
@@ -100,10 +104,6 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     new_settings = copy.deepcopy(settings)
     new_settings.address_size = new_address_size
     new_settings.timestamp_size = new_timestamp_size
-
-    # PDF_report function needs SpikesFile input
-    Functions.PDF_report(spikes_file, new_settings, dst_directory + "/../reports/" + dataset_name +
-                         "/" + file_name + ".pdf")
 
     end_time = time.time()
     print("Plots generated in " + '{0:.3f}'.format(end_time - start_time) + " seconds\n")
