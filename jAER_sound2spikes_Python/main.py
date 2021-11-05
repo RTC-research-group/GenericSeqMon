@@ -3,7 +3,8 @@ import os
 import socket
 import time
 
-from pyNAVIS import MainSettings
+from AERzip import compressionFunctions
+from pyNAVIS import MainSettings, ReportFunctions
 
 from logFunctions import logFile, logCompressedFile
 
@@ -75,6 +76,17 @@ if __name__ == '__main__':
         udp_socket.close()
 
     end_time = time.time()
+
+    # Generate PDF reports
+    for dir_path, dir_names, file_names in os.walk(dst_directory):
+        for f in file_names:
+            spikes_file = compressionFunctions.loadCompressedFile(os.path.abspath(os.path.join(dir_path, f)))
+            _, spikes_file, new_settings = compressionFunctions.compressedFileToSpikesFile(spikes_file, jAER_settings)
+
+            dataset_report_path = os.path.abspath(dst_directory + "/../reports/" + os.path.basename(dir_path) + "/")
+            if not os.path.exists(dataset_report_path):
+                os.makedirs(dataset_report_path)
+            ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
 
     diff = end_time - start_time
     seconds = int(diff % 60)
