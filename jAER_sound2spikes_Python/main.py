@@ -1,6 +1,7 @@
 import math
 import os
 import socket
+import sys
 import time
 
 from AERzip import compressionFunctions
@@ -32,42 +33,49 @@ if __name__ == '__main__':
     current_path = os.path.dirname(os.path.abspath(__file__))
 
     # Define datasets source and destination folders
-    src_directory = current_path + "/../datasets/audio"
+    src_directory = current_path + "/../datasets/audio/"
     if mode != "compressed":
-        dst_directory = current_path + "/../datasets/events"
+        dst_directory = current_path + "/../datasets/events/"
     else:
-        dst_directory = current_path + "/../datasets/compressedEvents"
+        dst_directory = current_path + "/../datasets/compressedEvents/"
 
-    # Get a list of all datasets in source (audio) folder
-    datasets = os.listdir(src_directory)
-    datasets_length = len(datasets)
+    # Open a file to write the comments
+    sys.stdout = open(dst_directory + "/console.log", 'w')
 
-    # Dataset count variable
-    dataset_count = 0
+    # Files and folders count
+    files_length = 0
+    folders_length = 0
 
-    # For each dataset get all files
-    for i in datasets:
-        # Increase the dataset count and clear the file count
-        dataset_count += 1
-        file_count = 0
+    for _, dirnames, files in os.walk(src_directory):
+        files_length += len(files)
+        folders_length += len(dirnames)
 
-        # Get a list of all files in the dataset and his length
-        files = os.listdir(src_directory + "/" + i)
-        files_length = len(files)
+    # More count variables
+    dataset_count = 1
+    file_count = 0
+    total_file_count = 0
 
-        # Read each file and convert audio information into events (through
-        # jAER processing) saving it in the new events folder
-        for j in files:
+    for directory, _, files in os.walk(src_directory):
+        for file_name in files:
             # Increase the file number
             file_count += 1
+            total_file_count += 1
+
+            dataset_name = os.path.relpath(directory, src_directory)
 
             if mode != "compressed":
-                logFile(src_directory, dst_directory, i, j, udp_socket)
+                logFile(src_directory, dst_directory, dataset_name, file_name, udp_socket)
             else:
-                logCompressedFile(src_directory, dst_directory, i, j, udp_socket, jAER_settings)
+                logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp_socket, jAER_settings)
 
-            print("File " + str(file_count) + "/" + str(files_length) + " in dataset " +
-                  str(dataset_count) + "/" + str(datasets_length) + " has been processed\n")
+            print("File " + str(file_count) + "/" + str(len(files)) + " (folder " + str(dataset_count) +
+                  "/" + str(folders_length) + ") has been processed. Total files: " + str(total_file_count) + "/" +
+                  str(files_length))
+
+            # Count update
+            if file_count == len(files):
+                dataset_count += 1
+                file_count = 0
 
     # Close the UDP connection to jAER
     if mode != "compressed":
@@ -77,7 +85,7 @@ if __name__ == '__main__':
 
     end_time = time.time()
 
-    # Generate PDF reports
+    '''# Generate PDF reports (compressed or uncompressed files)
     for dir_path, dir_names, file_names in os.walk(dst_directory):
         for f in file_names:
             spikes_file = compressionFunctions.loadCompressedFile(os.path.abspath(os.path.join(dir_path, f)))
@@ -88,12 +96,18 @@ if __name__ == '__main__':
             if not os.path.exists(dataset_report_path):
                 os.makedirs(dataset_report_path)
 
-            ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
+            ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")'''
 
+    # Time report
+    end_time = time.time()
     diff = end_time - start_time
-    seconds = int(diff % 60)
-    minutes = int(diff % (60 * 60))
-    hours = int(diff % (60 * 60 * 24))
-    days = int(math.floor(diff / (60 * 60 * 24)))
+    seconds = diff % 60
+    minutes = int((diff / 60) % 60)
+    hours = int((diff / (60 * 60)) % 24)
+    days = math.floor(diff / (60 * 60 * 24))
     print("All files have been processed in " + str(days) + " days, " + str(hours) + " hours, "
-          + str(minutes) + " minutes and " + str(diff) + " seconds")
+          + str(minutes) + " minutes and " + '{0:.3f}'.format(seconds) + " seconds")
+
+    # Shutdown
+    sys.stdout.close()
+    #os.system('shutdown -s')
