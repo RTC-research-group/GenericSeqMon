@@ -85,18 +85,19 @@ if __name__ == '__main__':
 
     end_time = time.time()
 
-    '''# Generate PDF reports (compressed or uncompressed files)
+    # Generate PDF reports (compressed or uncompressed files)
     for dir_path, dir_names, file_names in os.walk(dst_directory):
         for f in file_names:
             spikes_file = compressionFunctions.loadCompressedFile(os.path.abspath(os.path.join(dir_path, f)))
             _, spikes_file, new_settings = compressionFunctions.compressedFileToSpikesFile(spikes_file, jAER_settings)
 
-            dataset_report_path = os.path.abspath(dst_directory + "/../reports/" + os.path.basename(dir_path) + "/")
+            dataset_rel_path = os.path.relpath(dir_path, dst_directory)
+            dataset_report_path = os.path.abspath(dst_directory + "/../reports/" + dataset_rel_path + "/")
 
             if not os.path.exists(dataset_report_path):
                 os.makedirs(dataset_report_path)
 
-            ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")'''
+            ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
 
     # Time report
     end_time = time.time()
