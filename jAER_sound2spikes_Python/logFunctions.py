@@ -61,9 +61,9 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
 
     # Play the sound
     # TODO: v1.3.0 fails. Take note in the requirements of the package
-    time.sleep(0.1)
+    time.sleep(0.2)
     playsound(src_directory + "/" + dataset_name + "/" + file_name)
-    time.sleep(0.1)
+    time.sleep(0.2)
 
     # Enable ending of the data collector thread
     print("Stop collecting data")
