@@ -4,12 +4,14 @@ import socket
 import sys
 import time
 
+import matplotlib
 from AERzip import compressionFunctions
 from pyNAVIS import MainSettings, ReportFunctions
 
 from logFunctions import logFile, logCompressedFile
 
 if __name__ == '__main__':
+    # Start time
     start_time = time.time()
 
     # Define operation mode
@@ -84,6 +86,9 @@ if __name__ == '__main__':
         udp_socket.close()
 
     end_time = time.time()
+
+    # Set a non-interactive backend for matplotlib
+    matplotlib.use('pdf')
 
     # Generate PDF reports (compressed or uncompressed files)
     for dir_path, dir_names, file_names in os.walk(dst_directory):
