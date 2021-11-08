@@ -1,10 +1,10 @@
+import gc
 import math
 import os
 import socket
 import sys
 import time
 
-import matplotlib
 from AERzip import compressionFunctions
 from pyNAVIS import MainSettings, ReportFunctions
 
@@ -79,6 +79,9 @@ if __name__ == '__main__':
                 dataset_count += 1
                 file_count = 0
 
+            # Cleaning memory
+            gc.collect()
+
     # Close the UDP connection to jAER
     if mode != "compressed":
         udp_socket.close()
@@ -87,22 +90,24 @@ if __name__ == '__main__':
 
     end_time = time.time()
 
-    # Set a non-interactive backend for matplotlib
-    matplotlib.use('pdf')
-
     # Generate PDF reports (compressed or uncompressed files)
     for dir_path, dir_names, file_names in os.walk(dst_directory):
         for f in file_names:
-            spikes_file = compressionFunctions.loadCompressedFile(os.path.abspath(os.path.join(dir_path, f)))
-            _, spikes_file, new_settings = compressionFunctions.compressedFileToSpikesFile(spikes_file, jAER_settings)
+            if f.endswith('.aedat'):
+                dataset_rel_path = os.path.relpath(dir_path, dst_directory)
+                dataset_report_path = os.path.abspath(dst_directory + "/../reports/" + dataset_rel_path + "/")
 
-            dataset_rel_path = os.path.relpath(dir_path, dst_directory)
-            dataset_report_path = os.path.abspath(dst_directory + "/../reports/" + dataset_rel_path + "/")
+                if not os.path.exists(dataset_report_path + "/" + f + ".pdf"):
+                    if not os.path.exists(dataset_report_path):
+                        os.makedirs(dataset_report_path)
 
-            if not os.path.exists(dataset_report_path):
-                os.makedirs(dataset_report_path)
+                    spikes_file = compressionFunctions.loadCompressedFile(os.path.abspath(os.path.join(dir_path, f)))
+                    _, spikes_file, new_settings = compressionFunctions.compressedFileToSpikesFile(spikes_file, jAER_settings)
 
-            ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
+                    ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
+
+                    # Cleaning memory
+                    gc.collect()
 
     # Time report
     end_time = time.time()
@@ -116,4 +121,4 @@ if __name__ == '__main__':
 
     # Shutdown
     sys.stdout.close()
-    #os.system('shutdown -s')
+    os.system('shutdown -s')
