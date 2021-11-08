@@ -103,10 +103,15 @@ if __name__ == '__main__':
                     if not os.path.exists(dataset_report_path):
                         os.makedirs(dataset_report_path)
 
-                    spikes_file = compressionFunctions.loadCompressedFile(os.path.abspath(os.path.join(dir_path, f)))
-                    _, spikes_file, new_settings = compressionFunctions.compressedFileToSpikesFile(spikes_file, jAER_settings)
+                    compressed_file = compressionFunctions.loadCompressedFile(os.path.abspath(os.path.join(dir_path, f)))
+                    _, spikes_file, new_settings = compressionFunctions.compressedFileToSpikesFile(compressed_file, jAER_settings)
 
-                    ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
+                    # TODO: What to do with invalid files?
+                    try:
+                        ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
+                    except Exception:
+                        #os.remove(dataset_report_path + "/" + f + ".pdf")
+                        print("PDF generation failed: " + dataset_rel_path + "/" + f + ".pdf")
 
                     # Cleaning memory
                     gc.collect()
