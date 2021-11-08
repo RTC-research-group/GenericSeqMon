@@ -5,6 +5,7 @@ import socket
 import sys
 import time
 
+import librosa as librosa
 from AERzip import compressionFunctions
 from pyNAVIS import MainSettings, ReportFunctions
 
@@ -59,6 +60,7 @@ if __name__ == '__main__':
 
     for directory, _, files in os.walk(src_directory):
         for file_name in files:
+            # TODO: If compressed file doesn't exists
             # Increase the file number
             file_count += 1
             total_file_count += 1
@@ -119,6 +121,15 @@ if __name__ == '__main__':
     print("All files have been processed in " + str(days) + " days, " + str(hours) + " hours, "
           + str(minutes) + " minutes and " + '{0:.3f}'.format(seconds) + " seconds")
 
+    # Get total duration of audio files
+    total_audio_duration = 0
+
+    for dir_path, dir_names, file_names in os.walk(src_directory):
+        for f in file_names:
+            total_audio_duration += librosa.get_duration(filename=os.path.abspath(os.path.join(dir_path, f)))
+
+    print("Total audio duration: " + '{0:.3f}'.format(total_audio_duration) + " seconds")
+
     # Shutdown
     sys.stdout.close()
-    os.system('shutdown -s')
+    #os.system('shutdown -s')
