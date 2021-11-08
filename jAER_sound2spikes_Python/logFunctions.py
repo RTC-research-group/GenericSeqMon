@@ -98,16 +98,6 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     end_time = time.time()
     print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)")
 
-    # --- Generating plots ---
-    start_time = time.time()
-
-    new_settings = copy.deepcopy(settings)
-    new_settings.address_size = new_address_size
-    new_settings.timestamp_size = new_timestamp_size
-
-    end_time = time.time()
-    print("Plots generated in " + '{0:.3f}'.format(end_time - start_time) + " seconds\n")
-
 
 def collectUdpData(udp_socket):
     global data
