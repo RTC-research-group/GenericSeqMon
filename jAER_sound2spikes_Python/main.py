@@ -77,16 +77,18 @@ if __name__ == '__main__':
                     print("File " + str(file_count) + "/" + str(len(files)) + " (folder " + str(dataset_count) +
                           "/" + str(folders_length) + ") has been processed. Total files: " + str(total_file_count) + "/" +
                           str(files_length))
+
+                    # Cleaning memory
+                    gc.collect()
+
                 except Exception as e:
                     print("An exception occurred while trying to collect the data")
+                    print(e)
 
-                # Count update
-                if file_count == len(files):
-                    dataset_count += 1
-                    file_count = 0
-
-                # Cleaning memory
-                gc.collect()
+            # Count update
+            if file_count == len(files):
+                dataset_count += 1
+                file_count = 0
 
     # Close the UDP connection to jAER
     if mode != "compressed":
