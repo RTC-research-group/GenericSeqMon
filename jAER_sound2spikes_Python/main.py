@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
     # Define operation mode
     mode = "compressed"
+    compressor = "ZSTD"  # TODO: Add to log functions
 
     # Open connection to jAER
     udp_socket = None
@@ -60,29 +61,32 @@ if __name__ == '__main__':
 
     for directory, _, files in os.walk(src_directory):
         for file_name in files:
-            # TODO: If compressed file doesn't exists
+            dataset_name = os.path.relpath(directory, src_directory)
+
             # Increase the file number
             file_count += 1
             total_file_count += 1
 
-            dataset_name = os.path.relpath(directory, src_directory)
+            if not os.path.exists(dst_directory + dataset_name + "_aedats_" + compressor + "/" + file_name + ".aedat"):
+                try:
+                    if mode != "compressed":
+                        logFile(src_directory, dst_directory, dataset_name, file_name, udp_socket)
+                    else:
+                        logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp_socket, jAER_settings)
 
-            if mode != "compressed":
-                logFile(src_directory, dst_directory, dataset_name, file_name, udp_socket)
-            else:
-                logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp_socket, jAER_settings)
+                    print("File " + str(file_count) + "/" + str(len(files)) + " (folder " + str(dataset_count) +
+                          "/" + str(folders_length) + ") has been processed. Total files: " + str(total_file_count) + "/" +
+                          str(files_length))
+                except Exception as e:
+                    print("An exception occurred while trying to collect the data")
 
-            print("File " + str(file_count) + "/" + str(len(files)) + " (folder " + str(dataset_count) +
-                  "/" + str(folders_length) + ") has been processed. Total files: " + str(total_file_count) + "/" +
-                  str(files_length))
+                # Count update
+                if file_count == len(files):
+                    dataset_count += 1
+                    file_count = 0
 
-            # Count update
-            if file_count == len(files):
-                dataset_count += 1
-                file_count = 0
-
-            # Cleaning memory
-            gc.collect()
+                # Cleaning memory
+                gc.collect()
 
     # Close the UDP connection to jAER
     if mode != "compressed":
@@ -109,9 +113,10 @@ if __name__ == '__main__':
                     # TODO: What to do with invalid files?
                     try:
                         ReportFunctions.PDF_report(spikes_file, new_settings, dataset_report_path + "/" + f + ".pdf")
-                    except Exception:
+                    except Exception as e:
                         #os.remove(dataset_report_path + "/" + f + ".pdf")
                         print("PDF generation failed: " + dataset_rel_path + "/" + f + ".pdf")
+                        print(e)
 
                     # Cleaning memory
                     gc.collect()

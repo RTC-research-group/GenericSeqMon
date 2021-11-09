@@ -88,6 +88,7 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
     print("Compressing and storing data for file " + "/" + dataset_name + "_aedats" + "/" + file_name + ".aedat")
 
     # Trick to allow "original file" bytes conversion to SpikesFile object. TODO: AERzip must fix the parameters
+    # TODO: It's possible to increase perfomance time by threading the writing of the file
     spikes_file, settings = conversionFunctions.bytesToSpikesFile(data, settings, settings)
     new_address_size, new_timestamp_size = compressionFunctions.getBytesToPrune(spikes_file, settings)
     file_data = compressionFunctions.spikesFileToCompressedFile(spikes_file, settings, new_address_size,
@@ -96,7 +97,7 @@ def logCompressedFile(src_directory, dst_directory, dataset_name, file_name, udp
                                              "_aedats_" + compressor + "/" + file_name + ".aedat")
 
     end_time = time.time()
-    print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)")
+    print("Done! Compressed and stored in " + '{0:.3f}'.format(end_time - start_time) + " seconds (total time)\n")
 
 
 def collectUdpData(udp_socket):
